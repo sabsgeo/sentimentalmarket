@@ -19,7 +19,7 @@ from gevent import monkey as curious_george
 curious_george.patch_all(thread=False, select=False)
 
 
-supported_coins = ['eth']
+supported_coins = ['eth', 'xrp','matic', '1inch', 'bnb', 'ada']
 
 try:
     coin = sys.argv[1]
