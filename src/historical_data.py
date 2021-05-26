@@ -10,6 +10,7 @@ from config import TECHNICAL_INDICATOR_CONF
 class HistoricalData():
     currency = ''
     current_price = 0.0
+    max_array_size = 24
 
     def __init__(self):
         self.closes = dict(all_constants.EMPTY_UNIT_ARRAY)
@@ -17,6 +18,9 @@ class HistoricalData():
 
     def update_close_rate(self, rate, unit_time):
         self.closes[unit_time].append(rate)
+        if ( len(self.closes[unit_time]) == max_array_size + 1 ):
+            self.closes[unit_time].pop(0)
+
 
     def get_close_rate(self, unit_time):
         return self.closes[unit_time]
