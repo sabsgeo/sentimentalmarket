@@ -17,10 +17,9 @@ class HistoricalData():
         self.latest_rsi = dict(all_constants.EMPTY_UNIT_DICT)
 
     def update_close_rate(self, rate, unit_time):
-        self.closes[unit_time].append(rate)
-        if ( len(self.closes[unit_time]) == max_array_size + 1 ):
+        if ( len(self.closes[unit_time]) == self.max_array_size ):
             self.closes[unit_time].pop(0)
-
+        self.closes[unit_time].append(rate)
 
     def get_close_rate(self, unit_time):
         return self.closes[unit_time]
