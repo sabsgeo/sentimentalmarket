@@ -4,7 +4,7 @@ import talib
 import numpy
 
 from constants import all_constants
-from config import TECHNICAL_INDICATOR_CONF
+from config import all_configs
 
 
 class HistoricalData():
@@ -25,7 +25,7 @@ class HistoricalData():
         return self.closes[unit_time]
 
     def update_latest_rsi(self, unit_time):
-        for each_rsi in TECHNICAL_INDICATOR_CONF.get("RSI").get('period'):
+        for each_rsi in all_configs.TECHNICAL_INDICATOR_CONF.get("RSI").get('period'):
             if len(self.closes[unit_time]) > each_rsi:
                 np_closes = numpy.array(self.closes[unit_time])
                 rsi = talib.RSI(np_closes, each_rsi)

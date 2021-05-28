@@ -4,7 +4,7 @@ import grequests
 
 from historical_data import HistoricalData
 from constants import all_constants
-from config import TECHNICAL_INDICATOR_CONF
+from config import all_configs
 
 
 class SendNotification():
@@ -20,7 +20,7 @@ class SendNotification():
         self.bot_key = bot_key
         self.channel_id = channel_id
 
-    def notification_request(self, message):
+    def __notification_request(self, message):
         def do_something(response, *args, **kwargs):
             print('Notification send')
 
@@ -29,12 +29,12 @@ class SendNotification():
                              'response': do_something})
         job = grequests.send(req, grequests.Pool(1))
 
-    def rsi_notification(self):
+    def __rsi_notification(self):
         for unit_time in self.historical_data_instance.latest_rsi.keys():
             for each_rsi in self.historical_data_instance.latest_rsi[unit_time].keys():
                 current_value = self.historical_data_instance.latest_rsi[unit_time][each_rsi]
                 notification_text = None
-                if(current_value > TECHNICAL_INDICATOR_CONF.get('RSI').get('OVER_SOLD')):
+                if(current_value > all_configs.TECHNICAL_INDICATOR_CONF.get('RSI').get('OVER_SOLD')):
                     self.prev_low_rsi_data[unit_time][each_rsi] = -1
                     pre_high_rsi_val = -1
                     try:
@@ -50,11 +50,11 @@ class SendNotification():
                     self.prev_high_rsi_data[unit_time][each_rsi] = current_value
 
                     return notification_text
-                elif (current_value < TECHNICAL_INDICATOR_CONF.get('RSI').get('OVER_SOLD') and current_value > TECHNICAL_INDICATOR_CONF.get('RSI').get('UNDER_SOLD')):
+                elif (current_value < all_configs.TECHNICAL_INDICATOR_CONF.get('RSI').get('OVER_SOLD') and current_value > all_configs.TECHNICAL_INDICATOR_CONF.get('RSI').get('UNDER_SOLD')):
                     self.prev_high_rsi_data[unit_time][each_rsi] = -1
                     self.prev_low_rsi_data[unit_time][each_rsi] = -1
                     return None
-                elif (current_value < TECHNICAL_INDICATOR_CONF.get('RSI').get('UNDER_SOLD')):
+                elif (current_value < all_configs.TECHNICAL_INDICATOR_CONF.get('RSI').get('UNDER_SOLD')):
                     self.prev_high_rsi_data[unit_time][each_rsi] = -1
                     pre_low_rsi_val = -1
                     try:
@@ -79,9 +79,9 @@ class SendNotification():
         if not(self.historical_data_instance.latest_rsi == all_constants.EMPTY_UNIT_DICT):
             if not(self.prev_rsi == json.dumps(self.historical_data_instance.latest_rsi)):
                 print(self.historical_data_instance.latest_rsi)
-                value = self.rsi_notification()
+                value = self.__rsi_notification()
                 if value:
                     print(value)
-                    self.notification_request(value)
+                    self.__notification_request(value)
                 self.prev_rsi = json.dumps(
                     self.historical_data_instance.latest_rsi)

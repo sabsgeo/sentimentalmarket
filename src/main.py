@@ -1,14 +1,4 @@
-import send_notifocations
-import historical_data
-import decorators
-import config
-import websocket
-import asyncio
-from binance.enums import *
-from binance.client import Client
 import sys
-import time
-import json
 
 # For the warning
 # MonkeyPatchWarning: Monkey-patching ssl after ssl has already been imported may lead to errors,
@@ -18,8 +8,10 @@ import json
 from gevent import monkey as curious_george
 curious_george.patch_all(thread=False, select=False)
 
+from market_tracker import MarketTracker
+from config import all_configs
 
-supported_coins = ['eth', 'xrp','matic', '1inch', 'bnb', 'ada']
+supported_coins = all_configs.TECHNICAL_INDICATOR_CONF.get("SUPPORTED_COINS")
 
 try:
     coin = sys.argv[1]
@@ -42,67 +34,14 @@ except:
     print(f"Channel ID should be 3rd argument")
     sys.exit(1)
     pass
-print(coin)
-print(bot_key)
-print(channel_id)
 
 if not(coin in supported_coins):
     joined_coin = ",".join(supported_coins)
     print(f"Coin not supported. Supported coins are {supported_coins}")
     sys.exit(1)
 
-# Global Data initilization
-final_data = historical_data.HistoricalData()
-final_data.currency = coin
-snd_inst = send_notifocations.SendNotification(final_data, bot_key, channel_id)
+print(f"Running the docker for coin {coin} notification will be send to channel id {channel_id} using api key {bot_key}")
 
-
-def on_open(ws):
-    print('open connection')
-
-
-def on_close(ws):
-    print('close connection')
-
-
-@decorators.background
-def candle_stick_listner(coin, unit_time):
-    def on_candle_message(ws, message):
-        global final_data
-        json_message = json.loads(message)
-
-        candle = json_message['k']
-        is_candle_closed = candle['x']
-        close = candle['c']
-        unit_time = candle['i']
-
-        if is_candle_closed:
-            final_data.update_close_rate(float(close), unit_time)
-            final_data.update_latest_rsi(unit_time)
-
-    created_url = f'wss://stream.binance.com:9443/ws/{coin}usdt@kline_{unit_time}'
-    ws = websocket.WebSocketApp(created_url, on_open=on_open,
-                                on_close=on_close, on_message=on_candle_message)
-    ws.run_forever()
-
-
-@decorators.background
-def get_real_time_price(coin):
-    created_url = f'wss://stream.binance.com:9443/ws/{coin}usdt@trade'
-
-    def on_price_message(ws, message):
-        global final_data
-        final_data.current_price = json.loads(message)['p']
-    ws = websocket.WebSocketApp(created_url, on_open=on_open,
-                                on_close=on_close, on_message=on_price_message)
-    ws.run_forever()
-
-
-for unit_time in config.TECHNICAL_INDICATOR_CONF.get('TIME_WINDOW'):
-    candle_stick_listner(coin, unit_time)
-
-get_real_time_price(coin)
-
-while True:
-    time.sleep(.5)
-    snd_inst.send()
+if __name__ == "__main__":
+    markt = MarketTracker(coin, bot_key, channel_id)
+    markt.track()
