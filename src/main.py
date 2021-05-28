@@ -9,36 +9,9 @@ from gevent import monkey as curious_george
 curious_george.patch_all(thread=False, select=False)
 
 from market_tracker import MarketTracker
-from config import all_configs
+from arg_parser import parse_args
 
-supported_coins = all_configs.TECHNICAL_INDICATOR_CONF.get("SUPPORTED_COINS")
-
-try:
-    coin = sys.argv[1]
-except:
-    print(
-        f"Cryptocurrency should be the 1st argument. Supported coins are {supported_coins}")
-    sys.exit(1)
-    pass
-
-try:
-    bot_key = sys.argv[2]
-except:
-    print(f"Bot key should be 2nd argument")
-    sys.exit(1)
-    pass
-
-try:
-    channel_id = sys.argv[3]
-except:
-    print(f"Channel ID should be 3rd argument")
-    sys.exit(1)
-    pass
-
-if not(coin in supported_coins):
-    joined_coin = ",".join(supported_coins)
-    print(f"Coin not supported. Supported coins are {supported_coins}")
-    sys.exit(1)
+coin, bot_key, channel_id = parse_args(sys.argv)
 
 print(f"Running the docker for coin {coin} notification will be send to channel id {channel_id} using api key {bot_key}")
 
