@@ -30,7 +30,7 @@ def parse_args(all_args):
 
     if not(coin in supported_coins):
         joined_coin = ",".join(supported_coins)
-        print(f"Coin not supported. Supported coins are {supported_coins}")
+        print(f"Coin not supported. Supported coins are {joined_coin}")
         sys.exit(1)
 
     return coin, bot_key, channel_id
