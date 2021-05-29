@@ -8,6 +8,7 @@ import websocket
 from historical_data import HistoricalData
 from send_notifocations import SendNotification
 from config import all_configs
+from constants import all_constants
 
 
 class MarketTracker():
@@ -40,6 +41,11 @@ class MarketTracker():
         if is_candle_closed:
             self.final_data.update_close_rate(float(close), unit_time)
             self.final_data.update_latest_rsi(unit_time)
+            if (unit_time == all_constants.ONE_MIN_STRING and self.final_data.close_count == 0):
+                # giving this 5 second delay to mke sure all other have done calculation
+                time.sleep(5)
+                # closing 1 will reset all
+                self.websoc_collection[all_constants.ONE_MIN_STRING].close()
 
     def __on_message_candle_stick(self, ws, message):
         threading.Thread(target=self.__trading_calculation,

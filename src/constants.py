@@ -20,6 +20,10 @@ class _Const(object):
             "1h": {},
             "4h": {}
         }
+    
+    @decorators.constant
+    def ONE_MIN_STRING():
+        return "1m"
 
 
 all_constants = _Const()
