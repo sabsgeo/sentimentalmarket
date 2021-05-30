@@ -30,13 +30,20 @@ class HistoricalData():
         self.open_times[unit_time], self.openes[unit_time], self.highs[unit_time], self.lows[unit_time], self.closes[unit_time], self.volumes[unit_time], self.close_times[unit_time] = [
             list(map(lambda each_hist: None if each_hist[6] > int(time.time() * 1000) else int(float(each_hist[_])) if float(each_hist[_]) == int(float(each_hist[_])) else float(each_hist[_]), candle_data)) for _ in range(7)]
         # Removing for the ones which has not closed
-        if self.open_times[unit_time][-1] == None: self.open_times[unit_time].pop()
-        if self.openes[unit_time][-1] == None: self.openes[unit_time].pop()
-        if self.highs[unit_time][-1] == None: self.highs[unit_time].pop()
-        if self.lows[unit_time][-1] == None: self.lows[unit_time].pop()
-        if self.closes[unit_time][-1] == None: self.closes[unit_time].pop()
-        if self.volumes[unit_time][-1] == None: self.volumes[unit_time].pop()
-        if self.close_times[unit_time][-1] == None: self.close_times[unit_time].pop()
+        if self.open_times[unit_time][-1] == None:
+            self.open_times[unit_time].pop()
+        if self.openes[unit_time][-1] == None:
+            self.openes[unit_time].pop()
+        if self.highs[unit_time][-1] == None:
+            self.highs[unit_time].pop()
+        if self.lows[unit_time][-1] == None:
+            self.lows[unit_time].pop()
+        if self.closes[unit_time][-1] == None:
+            self.closes[unit_time].pop()
+        if self.volumes[unit_time][-1] == None:
+            self.volumes[unit_time].pop()
+        if self.close_times[unit_time][-1] == None:
+            self.close_times[unit_time].pop()
 
     def reset_all_data(self):
         self.open_times = dict(all_constants.EMPTY_UNIT_ARRAY)
@@ -48,6 +55,7 @@ class HistoricalData():
         self.close_times = dict(all_constants.EMPTY_UNIT_ARRAY)
 
         self.latest_rsi = dict(all_constants.EMPTY_UNIT_DICT)
+        self.latest_macd = dict(all_constants.EMPTY_UNIT_DICT)
         self.close_count = 0
 
     def __update_candle_data(self, candle_data, unit_time):
@@ -67,7 +75,7 @@ class HistoricalData():
         self.closes[unit_time].append(float(candle_data['c']))
         self.volumes[unit_time].append(float(candle_data['v']))
         self.close_times[unit_time].append(int(candle_data['T']))
-    
+
     def update_candle_data(self, candle_data, unit_time):
         reset_history = False
 
@@ -106,4 +114,5 @@ class HistoricalData():
             np_closes = numpy.array(self.closes[unit_time])
             analysis = talib.MACD(
                 np_closes, fastperiod=FAST_P, slowperiod=SLOW_P, signalperiod=MACD_SIG)
-            print(analysis)
+            self.latest_macd[unit_time] = {
+                'mac': analysis[0][-1], 'signal': analysis[1][-1], 'histogram': analysis[2][-1]}

@@ -43,7 +43,13 @@ class MarketTracker():
             hist_data_res = requests.get(hist_data)
             if (hist_data_res.status_code == 200):
                 all_hist_data = hist_data_res.json()
+                start = time.time()
                 self.final_data.initilize_candle_data(all_hist_data, unit_time)
+                self.final_data.update_latest_rsi(unit_time)
+                self.final_data.update_latest_macd(unit_time)
+                end = time.time()
+                if (all_configs.IS_DEBUG):
+                    print(f"Time taken for initial indicator calculations {str(end - start)} sec")
         
         # This condition makes sure that collection of real time data happens if
         # latest candle stick is closed and the historical data is filled 
@@ -54,7 +60,7 @@ class MarketTracker():
             self.final_data.update_latest_macd(unit_time)
             end = time.time()
             if (all_configs.IS_DEBUG):
-                print(f"Time taken for indicator calculation {str(end - start)} sec")
+                print(f"Time taken for indicator calculations {str(end - start)} sec")
             
             if (unit_time == all_constants.ONE_MIN_STRING and self.final_data.close_count == 0):
                 # giving this 5 second delay to mke sure all other have done calculation
