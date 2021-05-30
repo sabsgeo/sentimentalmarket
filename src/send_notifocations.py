@@ -8,7 +8,8 @@ from config import all_configs
 
 
 class SendNotification():
-    prev_close = json.dumps(all_constants.EMPTY_UNIT_ARRAY)
+    # This variable is not useful right now might not be the case tmrw
+    # prev_close = json.dumps(all_constants.EMPTY_UNIT_ARRAY)
 
     # RSI data for checks
     prev_rsi = json.dumps(all_constants.EMPTY_UNIT_DICT)
@@ -70,11 +71,12 @@ class SendNotification():
                     return notification_text
 
     def send(self):
-        if not(self.historical_data_instance.closes == all_constants.EMPTY_UNIT_ARRAY):
-            if not(self.prev_close == json.dumps(self.historical_data_instance.closes)):
-                print(self.historical_data_instance.closes)
-                self.prev_close = json.dumps(
-                    self.historical_data_instance.closes)
+        # This code not useful right now might be usefulin future
+        # if not(self.historical_data_instance.closes == all_constants.EMPTY_UNIT_ARRAY):
+        #     if not(self.prev_close == json.dumps(self.historical_data_instance.closes)):
+        #         # print(self.historical_data_instance.closes)
+        #         self.prev_close = json.dumps(
+        #             self.historical_data_instance.closes)
 
         if not(self.historical_data_instance.latest_rsi == all_constants.EMPTY_UNIT_DICT):
             if not(self.prev_rsi == json.dumps(self.historical_data_instance.latest_rsi)):

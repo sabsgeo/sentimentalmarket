@@ -1,4 +1,5 @@
 import json
+import time
 
 import talib
 import numpy
@@ -27,7 +28,15 @@ class HistoricalData():
 
     def initilize_candle_data(self, candle_data, unit_time):
         self.open_times[unit_time], self.openes[unit_time], self.highs[unit_time], self.lows[unit_time], self.closes[unit_time], self.volumes[unit_time], self.close_times[unit_time] = [
-            list(map(lambda each_hist: int(float(each_hist[_])) if float(each_hist[_]) == int(float(each_hist[_])) else float(each_hist[_]), candle_data)) for _ in range(7)]
+            list(map(lambda each_hist: None if each_hist[6] > int(time.time() * 1000) else int(float(each_hist[_])) if float(each_hist[_]) == int(float(each_hist[_])) else float(each_hist[_]), candle_data)) for _ in range(7)]
+        # Removing for the ones which has not closed
+        if self.open_times[unit_time][-1] == None: self.open_times[unit_time].pop()
+        if self.openes[unit_time][-1] == None: self.openes[unit_time].pop()
+        if self.highs[unit_time][-1] == None: self.highs[unit_time].pop()
+        if self.lows[unit_time][-1] == None: self.lows[unit_time].pop()
+        if self.closes[unit_time][-1] == None: self.closes[unit_time].pop()
+        if self.volumes[unit_time][-1] == None: self.volumes[unit_time].pop()
+        if self.close_times[unit_time][-1] == None: self.close_times[unit_time].pop()
 
     def reset_all_data(self):
         self.open_times = dict(all_constants.EMPTY_UNIT_ARRAY)
@@ -41,38 +50,43 @@ class HistoricalData():
         self.latest_rsi = dict(all_constants.EMPTY_UNIT_DICT)
         self.close_count = 0
 
+    def __update_candle_data(self, candle_data, unit_time):
+        if (len(self.closes[unit_time]) == self.max_array_size):
+            self.open_times[unit_time].pop(0)
+            self.openes[unit_time].pop(0)
+            self.highs[unit_time].pop(0)
+            self.lows[unit_time].pop(0)
+            self.closes[unit_time].pop(0)
+            self.volumes[unit_time].pop(0)
+            self.close_times[unit_time].pop(0)
+
+        self.open_times[unit_time].append(int(candle_data['t']))
+        self.openes[unit_time].append(float(candle_data['o']))
+        self.highs[unit_time].append(float(candle_data['h']))
+        self.lows[unit_time].append(float(candle_data['l']))
+        self.closes[unit_time].append(float(candle_data['c']))
+        self.volumes[unit_time].append(float(candle_data['v']))
+        self.close_times[unit_time].append(int(candle_data['T']))
+    
     def update_candle_data(self, candle_data, unit_time):
         reset_history = False
+
+        if unit_time == all_constants.ONE_MIN_STRING:
+            self.close_count = self.close_count + 1
+
         # Making sure with 1m we are always on tack with 12 hrs
         # This helps in reset after 12 hrs
         if (self.close_times[unit_time][-1] == int(candle_data['T']) and self.open_times[unit_time][-1] == int(candle_data['t'])):
             print("Omiting a data entry as data is present")
-        elif (self.close_times[unit_time][-1] - int(candle_data['T']) != all_configs.TECHNICAL_INDICATOR_CONF.get("TIME_WINDOW_IN_MSEC").get(unit_time) and self.open_times[unit_time][-1] - int(candle_data['t']) != all_configs.TECHNICAL_INDICATOR_CONF.get("TIME_WINDOW_IN_MSEC").get(unit_time)):
+        elif (not(int(candle_data['T']) - self.close_times[unit_time][-1] == all_configs.TECHNICAL_INDICATOR_CONF.get("TIME_WINDOW_IN_MSEC").get(unit_time)) and not(int(candle_data['t']) - self.open_times[unit_time][-1] == all_configs.TECHNICAL_INDICATOR_CONF.get("TIME_WINDOW_IN_MSEC").get(unit_time))):
             print("Data is getting reset")
             reset_history = True
         elif (self.close_times[unit_time][-1] != int(candle_data['T']) and self.open_times[unit_time][-1] != int(candle_data['t'])):
-            if unit_time == all_constants.ONE_MIN_STRING:
-                self.close_count = self.close_count + 1
+            print("Adding new data")
+            self.__update_candle_data(candle_data, unit_time)
 
-            if (len(self.closes[unit_time]) == self.max_array_size):
-                self.open_times[unit_time].pop(0)
-                self.openes[unit_time].pop(0)
-                self.highs[unit_time].pop(0)
-                self.lows[unit_time].pop(0)
-                self.closes[unit_time].pop(0)
-                self.volumes[unit_time].pop(0)
-                self.close_times[unit_time].pop(0)
-
-            self.open_times[unit_time].append(int(candle_data['t']))
-            self.openes[unit_time].append(float(candle_data['o']))
-            self.highs[unit_time].append(float(candle_data['h']))
-            self.lows[unit_time].append(float(candle_data['l']))
-            self.closes[unit_time].append(float(candle_data['c']))
-            self.volumes[unit_time].append(float(candle_data['v']))
-            self.close_times[unit_time].append(int(candle_data['T']))
-
-            if ((unit_time == all_constants.ONE_MIN_STRING and self.close_count % self.twelve_hrs_in_min == 0) or reset_history):
-                self.close_count = 0
+        if ((unit_time == all_constants.ONE_MIN_STRING and self.close_count % self.twelve_hrs_in_min == 0) or reset_history):
+            self.close_count = 0
 
     def update_latest_rsi(self, unit_time):
         for each_rsi in all_configs.TECHNICAL_INDICATOR_CONF.get("RSI").get('period'):
