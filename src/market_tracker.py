@@ -37,10 +37,12 @@ class MarketTracker():
         is_candle_closed = candle['x']
         close = candle['c']
         unit_time = candle['i']
+        print(candle)
 
         if is_candle_closed:
             self.final_data.update_close_rate(float(close), unit_time)
             self.final_data.update_latest_rsi(unit_time)
+            self.final_data.update_latest_macd(unit_time)
             if (unit_time == all_constants.ONE_MIN_STRING and self.final_data.close_count == 0):
                 # giving this 5 second delay to mke sure all other have done calculation
                 time.sleep(5)

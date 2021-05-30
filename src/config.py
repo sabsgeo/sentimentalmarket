@@ -19,22 +19,14 @@ class _Configs(object):
                 "OVER_SOLD": 70,
                 "UNDER_SOLD": 30
             },
+            "MACD": {
+                "MACD_FAST": 12,
+                "MACD_SLOW": 26,
+                "MACD_SIGNAL": 9
+            },
             "TIME_WINDOW": ["1m", "15m", "1h", "4h"],
             "SUPPORTED_COINS": ['eth', 'xrp', 'matic', '1inch', 'bnb', 'ada']
         }
 
 
 all_configs = _Configs()
-
-
-# API_KEY = ""
-# API_SECRET = ""
-# TECHNICAL_INDICATOR_CONF = {
-#     "RSI": {
-#         "period": [6, 12, 24],
-#         "OVER_SOLD": 70,
-#         "UNDER_SOLD": 30
-#     },
-#     "TIME_WINDOW": ["1m", "15m", "1h", "4h"],
-#     "SUPPORTED_COINS": ['eth', 'xrp', 'matic', '1inch', 'bnb', 'ada']
-# }

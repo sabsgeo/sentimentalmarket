@@ -10,7 +10,7 @@ from config import all_configs
 class HistoricalData():
     currency = ''
     current_price = 0.0
-    max_array_size = 24
+    max_array_size = 48
     twelve_hrs_in_min = 720
 
     def __init__(self):
@@ -42,3 +42,13 @@ class HistoricalData():
                 np_closes = numpy.array(self.closes[unit_time])
                 rsi = talib.RSI(np_closes, each_rsi)
                 self.latest_rsi[unit_time][each_rsi] = rsi[-1]
+    
+    def update_latest_macd(self, unit_time):
+        FAST_P = all_configs.TECHNICAL_INDICATOR_CONF.get("MACD").get("MACD_FAST")
+        SLOW_P = all_configs.TECHNICAL_INDICATOR_CONF.get("MACD").get("MACD_SLOW")
+        MACD_SIG = all_configs.TECHNICAL_INDICATOR_CONF.get("MACD").get("MACD_SIGNAL")
+        if (len(self.closes[unit_time]) > all_configs.TECHNICAL_INDICATOR_CONF.get("MACD").get("MACD_SLOW")):
+            np_closes = numpy.array(self.closes[unit_time])
+            analysis = talib.MACD(np_closes, fastperiod=FAST_P, slowperiod=SLOW_P, signalperiod=MACD_SIG)
+            print(analysis)
+            
