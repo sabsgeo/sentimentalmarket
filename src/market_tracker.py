@@ -4,6 +4,7 @@ import json
 import sys
 
 import websocket
+import requests
 
 from historical_data import HistoricalData
 from send_notifocations import SendNotification
@@ -35,14 +36,26 @@ class MarketTracker():
 
         candle = json_message['k']
         is_candle_closed = candle['x']
-        close = candle['c']
         unit_time = candle['i']
-        print(candle)
-
-        if is_candle_closed:
-            self.final_data.update_close_rate(float(close), unit_time)
+        
+        if (len(self.final_data.closes[unit_time]) == 0):
+            hist_data = f'https://api.binance.com/api/v3/klines?symbol={self.coin.upper()}USDT&interval={unit_time}'
+            hist_data_res = requests.get(hist_data)
+            if (hist_data_res.status_code == 200):
+                all_hist_data = hist_data_res.json()
+                self.final_data.initilize_candle_data(all_hist_data, unit_time)
+        
+        # This condition makes sure that collection of real time data happens if
+        # latest candle stick is closed and the historical data is filled 
+        if (is_candle_closed and len(self.final_data.closes[unit_time]) > 0):
+            start = time.time()
+            self.final_data.update_candle_data(candle, unit_time)
             self.final_data.update_latest_rsi(unit_time)
             self.final_data.update_latest_macd(unit_time)
+            end = time.time()
+            if (all_configs.IS_DEBUG):
+                print(f"Time taken for indicator calculation {str(end - start)} sec")
+            
             if (unit_time == all_constants.ONE_MIN_STRING and self.final_data.close_count == 0):
                 # giving this 5 second delay to mke sure all other have done calculation
                 time.sleep(5)
