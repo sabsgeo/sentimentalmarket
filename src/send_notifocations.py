@@ -8,12 +8,14 @@ from config import all_configs
 
 
 class SendNotification():
-    prev_close = json.dumps(all_constants.EMPTY_UNIT_ARRAY)
 
     # RSI data for checks
     prev_rsi = json.dumps(all_constants.EMPTY_UNIT_DICT)
     prev_high_rsi_data = dict(all_constants.EMPTY_UNIT_DICT)
     prev_low_rsi_data = dict(all_constants.EMPTY_UNIT_DICT)
+
+    # MACD checks
+    prev_macd = json.dumps(all_constants.EMPTY_UNIT_DICT)
 
     def __init__(self, hd_instance: HistoricalData, bot_key, channel_id):
         self.historical_data_instance = hd_instance
@@ -70,14 +72,9 @@ class SendNotification():
                     return notification_text
 
     def send(self):
-        if not(self.historical_data_instance.closes == all_constants.EMPTY_UNIT_ARRAY):
-            if not(self.prev_close == json.dumps(self.historical_data_instance.closes)):
-                print(self.historical_data_instance.closes)
-                self.prev_close = json.dumps(
-                    self.historical_data_instance.closes)
-
         if not(self.historical_data_instance.latest_rsi == all_constants.EMPTY_UNIT_DICT):
             if not(self.prev_rsi == json.dumps(self.historical_data_instance.latest_rsi)):
+                print("rsi")
                 print(self.historical_data_instance.latest_rsi)
                 value = self.__rsi_notification()
                 if value:
@@ -85,3 +82,10 @@ class SendNotification():
                     self.__notification_request(value)
                 self.prev_rsi = json.dumps(
                     self.historical_data_instance.latest_rsi)
+
+        if not(self.historical_data_instance.latest_macd == all_constants.EMPTY_UNIT_DICT):
+            if not(self.prev_macd == json.dumps(self.historical_data_instance.latest_macd)):
+                print("macd")
+                print(self.historical_data_instance.latest_macd)
+                self.prev_macd = json.dumps(
+                    self.historical_data_instance.latest_macd)
