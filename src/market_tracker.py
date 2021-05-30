@@ -110,6 +110,7 @@ class MarketTracker():
     def track(self):
         # This to make sure to try till success
         while True:
+            self.final_data.reset_all_data()
             self.run_till_end = True
             for unit_time in all_configs.TECHNICAL_INDICATOR_CONF.get('TIME_WINDOW'):
                 threading.Thread(target=self.__start_candles,
@@ -121,4 +122,4 @@ class MarketTracker():
                 time.sleep(.5)
                 threading.Thread(target=self.snd_inst.send).start()
             # adding this delay to give time for all the websocke to get closed before restart
-            time.sleep(1)
+            time.sleep(5)

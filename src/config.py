@@ -28,8 +28,8 @@ class _Configs(object):
                 "MACD_SLOW": 26,
                 "MACD_SIGNAL": 9
             },
-            "TIME_WINDOW": ["1m", "5m", "15m", "1h", "4h"],
-            "TIME_WINDOW_IN_MSEC": {"1m":60000, "5m": 300000, "15m": 900000, "1h": 3600000, "4h": 14400000},
+            "TIME_WINDOW": ["1m", "5m", "15m", "1h", "4h", "1d"],
+            "TIME_WINDOW_IN_MSEC": {"1m":60000, "5m": 300000, "15m": 900000, "1h": 3600000, "4h": 14400000, "1d": 86400000},
             "SUPPORTED_COINS": ['eth', 'xrp', 'matic', '1inch', 'bnb', 'ada']
         }
 
