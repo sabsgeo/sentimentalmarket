@@ -1,4 +1,7 @@
 import json
+import logging
+logger = logging.getLogger(__name__)
+
 
 import grequests
 
@@ -24,7 +27,7 @@ class SendNotification():
 
     def __notification_request(self, message):
         def do_something(response, *args, **kwargs):
-            print('Notification send')
+            logger.info('Notification send')
 
         send_message_url = f'https://api.telegram.org/bot{self.bot_key}/sendMessage?chat_id={self.channel_id}&text={message}&parse_mode=markdown'
         req = grequests.post(send_message_url, hooks={
@@ -74,18 +77,18 @@ class SendNotification():
     def send(self):
         if not(self.historical_data_instance.latest_rsi == all_constants.EMPTY_UNIT_DICT):
             if not(self.prev_rsi == json.dumps(self.historical_data_instance.latest_rsi)):
-                print("rsi")
-                print(self.historical_data_instance.latest_rsi)
+                logger.info("rsi")
+                logger.info(self.historical_data_instance.latest_rsi)
                 value = self.__rsi_notification()
                 if value:
-                    print(value)
+                    logger.info(value)
                     self.__notification_request(value)
                 self.prev_rsi = json.dumps(
                     self.historical_data_instance.latest_rsi)
 
         if not(self.historical_data_instance.latest_macd == all_constants.EMPTY_UNIT_DICT):
             if not(self.prev_macd == json.dumps(self.historical_data_instance.latest_macd)):
-                print("macd")
-                print(self.historical_data_instance.latest_macd)
+                logger.info("macd")
+                logger.info(self.historical_data_instance.latest_macd)
                 self.prev_macd = json.dumps(
                     self.historical_data_instance.latest_macd)
