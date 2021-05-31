@@ -1,4 +1,8 @@
 import sys
+import logging
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
+
 
 # For the warning
 # MonkeyPatchWarning: Monkey-patching ssl after ssl has already been imported may lead to errors,
@@ -13,7 +17,7 @@ from arg_parser import parse_args
 
 coin, bot_key, channel_id = parse_args(sys.argv)
 
-print(f"Running the docker for coin {coin} notification will be send to channel id {channel_id} using api key {bot_key}")
+logger.info(f"Running the docker for coin {coin} notification will be send to channel id {channel_id} using api key {bot_key}")
 
 if __name__ == "__main__":
     markt = MarketTracker(coin, bot_key, channel_id)
