@@ -1,4 +1,4 @@
-# Crypto Market Notifier
+# Crypto Trading bot
 This is a docker application which will send you triggers by checking trading indicators
 Right now trading indictor that is been inregrated is RSI.
 More indicators will be added soon
@@ -123,14 +123,11 @@ Example data output format
 
 
 ## Rules that are coded
-1. If the RSI > 70 or RSI < 30 the channel will notification
-2. If the RSI value goes above 70 and when it reaches to the top and then starts to come down it will send notification
-3. If the RSI value goes below 30 and when it reaches the bottom and then starts to come up then it will send notification
+1. RSI MACD and VWAP calculations are happening accurately and tested it with https://coinmarketcap.com/ Ethereum data
 
 ## Future plan
-1. Add MACD indicator and integrate with RSI
-2. Add VWAP indicator and integrate to both RSI and MACD
-3. Add candle stick patten detection
+1. Add candle stick patten detection
+2. Making a decision based on the above params
 
 ## Disclamer
 I am not a market expert I am just coding things that I have learned from my information sources
