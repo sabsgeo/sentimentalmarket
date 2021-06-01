@@ -3,3 +3,4 @@ TA-Lib==0.4.20
 numpy==1.20.3
 websocket-client==1.0.1
 grequests==0.6.0
+ta==0.7.0

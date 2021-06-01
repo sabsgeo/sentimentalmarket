@@ -93,7 +93,7 @@ class HistoricalData():
         if (self.close_times[unit_time][-1] == int(candle_data['T']) and self.open_times[unit_time][-1] == int(candle_data['t'])):
             logger.debug("Updating the older value")
             self.__update_candle_data(candle_data, unit_time, True)
-        elif (not(int(candle_data['T']) - self.close_times[unit_time][-1] == all_configs.TECHNICAL_INDICATOR_CONF.get("TIME_WINDOW_IN_MSEC").get(unit_time)) and not(int(candle_data['t']) - self.open_times[unit_time][-1] == all_configs.TECHNICAL_INDICATOR_CONF.get("TIME_WINDOW_IN_MSEC").get(unit_time))):
+        elif (not(int(candle_data['T']) - self.close_times[unit_time][-1] == all_constants.TIME_WINDOW_IN_MSEC.get(unit_time)) and not(int(candle_data['t']) - self.open_times[unit_time][-1] == all_constants.TIME_WINDOW_IN_MSEC.get(unit_time))):
             logger.debug("Data is getting reset")
             self.reset_data = True
         elif (self.close_times[unit_time][-1] != int(candle_data['T']) and self.open_times[unit_time][-1] != int(candle_data['t'])):
