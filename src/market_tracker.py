@@ -7,7 +7,6 @@ from datetime import datetime
 import logging
 logger = logging.getLogger(__name__)
 
-
 import websocket
 import requests
 
@@ -62,7 +61,7 @@ class MarketTracker():
                     for index in range(len(all_hist_data)):
                         if (index > 0 and index < len(all_hist_data) - 1):
                             # If the difference between adjsent points should be unit time else data is not correct
-                            if not(all_hist_data[index][0] - all_hist_data[index - 1][0] == all_configs.TECHNICAL_INDICATOR_CONF.get("TIME_WINDOW_IN_MSEC").get(unit_time)):
+                            if not(all_hist_data[index][0] - all_hist_data[index - 1][0] == all_constants.TIME_WINDOW_IN_MSEC.get(unit_time)):
                                 bad_count = bad_count + 1
                     # There seems to be two data data missing for 1 hr chart
                     if (bad_count > 0 and not(unit_time == '1h')):
@@ -78,8 +77,7 @@ class MarketTracker():
                 self.final_data.update_latest_rsi(unit_time)
                 self.final_data.update_latest_macd(unit_time)
                 end = time.time()
-                if (all_configs.IS_DEBUG):
-                    logger.debug(f"Time taken for initial indicator calculations {str(end - start)} sec")
+                logger.debug(f"Time taken for initial indicator calculations {str(end - start)} sec")
         
         # This condition makes sure that collection of real time data happens if
         # latest candle stick is closed and the historical data is filled 
@@ -94,12 +92,14 @@ class MarketTracker():
             today = datetime.utcnow().date()
             start = datetime(today.year, today.month, today.day, tzinfo=tz.tzutc())
             market_reset = False
-            if (unit_time == all_constants.ONE_MIN_STRING and is_candle_closed):
-                market_reset = int(self.final_data.open_times[all_constants.ONE_MIN_STRING][-1] + all_configs.TECHNICAL_INDICATOR_CONF.get("TIME_WINDOW_IN_MSEC").get(all_constants.ONE_MIN_STRING)) == int(start.timestamp() * 1000) + all_configs.TECHNICAL_INDICATOR_CONF.get("TIME_WINDOW_IN_MSEC").get("1d")
+            smallest_unit_time = all_configs.TECHNICAL_INDICATOR_CONF.get("TIME_WINDOW")[0]
+            one_day_in_ms = all_constants.TIME_WINDOW_IN_MSEC.get("1d")
+            if (unit_time == smallest_unit_time and is_candle_closed):
+                market_reset = int(self.final_data.open_times[smallest_unit_time][-1] +  all_constants.TIME_WINDOW_IN_MSEC.get(smallest_unit_time)) == int(start.timestamp() * 1000) + one_day_in_ms
             
             if (market_reset or self.final_data.reset_data):
                 # giving this 5 second delay to mke sure all other have done calculation
-                self.websoc_collection[all_constants.ONE_MIN_STRING].close()
+                self.websoc_collection[smallest_unit_time].close()
                 time.sleep(5)
                 # closing 1 will reset all
 
