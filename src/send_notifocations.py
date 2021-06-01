@@ -19,6 +19,8 @@ class SendNotification():
 
     # MACD checks
     prev_macd = json.dumps(all_constants.EMPTY_UNIT_DICT)
+    prev_rsi = json.dumps(all_constants.EMPTY_UNIT_DICT)
+    prev_vwap = json.dumps(all_constants.EMPTY_UNIT_DICT)
 
     def __init__(self, hd_instance: HistoricalData, bot_key, channel_id):
         self.historical_data_instance = hd_instance
@@ -92,3 +94,10 @@ class SendNotification():
                 logger.info(self.historical_data_instance.latest_macd)
                 self.prev_macd = json.dumps(
                     self.historical_data_instance.latest_macd)
+                
+        if not(self.historical_data_instance.latest_vwap == all_constants.EMPTY_UNIT_DICT):
+            if not(self.prev_vwap == json.dumps(self.historical_data_instance.latest_vwap)):
+                logger.info("vwap")
+                logger.info(self.historical_data_instance.latest_vwap)
+                self.prev_vwap = json.dumps(
+                    self.historical_data_instance.latest_vwap)

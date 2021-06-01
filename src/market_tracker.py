@@ -72,22 +72,13 @@ class MarketTracker():
                         logger.error(f"Data is not good {unit_time}")
 
             if (len(all_hist_data) > 0):
-                start = time.time()
                 self.final_data.initilize_candle_data(all_hist_data, unit_time)
-                self.final_data.update_latest_rsi(unit_time)
-                self.final_data.update_latest_macd(unit_time)
-                end = time.time()
-                logger.debug(f"Time taken for initial indicator calculations {str(end - start)} sec")
         
         # This condition makes sure that collection of real time data happens if
         # latest candle stick is closed and the historical data is filled 
         if (len(self.final_data.closes[unit_time]) > 0):
-            start = time.time()
             self.final_data.update_candle_data(candle, unit_time)
-            self.final_data.update_latest_rsi(unit_time)
-            self.final_data.update_latest_macd(unit_time)
-            end = time.time()
-            logger.debug(f"Time taken for indicator calculations {str(end - start)} sec")
+            self.update_indicators(unit_time)
             
             today = datetime.utcnow().date()
             start = datetime(today.year, today.month, today.day, tzinfo=tz.tzutc())
@@ -164,3 +155,11 @@ class MarketTracker():
                 threading.Thread(target=self.snd_inst.send).start()
             # adding this delay to give time for all the websocke to get closed before restart
             time.sleep(5)
+    def update_indicators(self, unit_time):
+        start = time.time()
+        for name in dir(self.final_data):
+            if name.startswith('update_latest_'):
+                m = getattr(self.final_data, name)
+                m(unit_time)
+        end = time.time()
+        logger.debug(f"Time taken for indicator calculations {str(end - start)} sec")
