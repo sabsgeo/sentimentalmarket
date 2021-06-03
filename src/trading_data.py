@@ -135,7 +135,8 @@ class TradingData():
             start = datetime(today.year, today.month, today.day, tzinfo=tz.tzutc())
             start_in_ms = start.timestamp() * 1000
             now_in_ms = time.time() * 1000
-            index = math.floor(int(now_in_ms - start_in_ms)/ all_constants.TIME_WINDOW_IN_MSEC[unit_time]) + 1
+            time_index = int(now_in_ms - start_in_ms)/ all_constants.TIME_WINDOW_IN_MSEC[unit_time]
+            index = math.floor(time_index) if round(math.floor(time_index),2) == round(time_index, 2) else math.floor(time_index) + 1
             trading_day_open_times = self.open_times[unit_time][index * -1:]
             
             if (trading_day_open_times[0] == int(start_in_ms)):
@@ -149,5 +150,4 @@ class TradingData():
                 self.latest_vwap[unit_time] = {"price": round(vwap.tolist()[-1], 2)}
             else:
                 self.reset_data  = True
-                logger.error("There is a issue in getting todays trading data to calculate vwap")
-
+                logger.error(f"There is a issue in getting todays trading data to calculate vwap for interval {unit_time}")
