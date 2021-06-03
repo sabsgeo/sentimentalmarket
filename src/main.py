@@ -12,7 +12,8 @@ logging.basicConfig(level=logging.INFO)
 from gevent import monkey as curious_george
 curious_george.patch_all(thread=False, select=False)
 
-from market_tracker import MarketTracker
+# from market_data_tracker import MarketDataTracker
+from start_trading import StartTrading
 from arg_parser import parse_args
 
 coin, bot_key, channel_id = parse_args(sys.argv)
@@ -20,5 +21,7 @@ coin, bot_key, channel_id = parse_args(sys.argv)
 logger.info(f"Running the docker for coin {coin} notification will be send to channel id {channel_id} using api key {bot_key}")
 
 if __name__ == "__main__":
-    markt = MarketTracker(coin, bot_key, channel_id)
-    markt.track()
+    trade = StartTrading(coin)
+    trade.trade()
+    # markt = MarketDataTracker(coin, bot_key, channel_id)
+    # markt.track()

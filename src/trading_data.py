@@ -15,12 +15,12 @@ from constants import all_constants
 from config import all_configs
 
 
-class HistoricalData():
-    currency = ''
+class TradingData():
     current_price = 0.0
     max_array_size = 1440
 
-    def __init__(self):
+    def __init__(self, coin):
+        self.currency = coin
         self.open_times = dict(all_constants.EMPTY_UNIT_ARRAY)
         self.openes = dict(all_constants.EMPTY_UNIT_ARRAY)
         self.highs = dict(all_constants.EMPTY_UNIT_ARRAY)
@@ -34,7 +34,7 @@ class HistoricalData():
         self.latest_vwap = dict(all_constants.EMPTY_UNIT_DICT)
         self.reset_data = False
 
-    def initilize_candle_data(self, candle_data, unit_time):
+    def add_historical_candle_data(self, candle_data, unit_time):
         self.open_times[unit_time], self.openes[unit_time], self.highs[unit_time], self.lows[unit_time], self.closes[unit_time], self.volumes[unit_time], self.close_times[unit_time] = [
             list(map(lambda each_hist: None if each_hist[6] > int(time.time() * 1000) else int(float(each_hist[_])) if float(each_hist[_]) == int(float(each_hist[_])) else float(each_hist[_]), candle_data)) for _ in range(7)]
         # Removing for the ones which has not closed
@@ -148,5 +148,6 @@ class HistoricalData():
                 # https://gist.github.com/jxm262/449aed7f3ce0919e57a1f0ad8c18a9d9
                 self.latest_vwap[unit_time] = {"price": round(vwap.tolist()[-1], 2)}
             else:
+                self.reset_data  = True
                 logger.error("There is a issue in getting todays trading data to calculate vwap")
 
