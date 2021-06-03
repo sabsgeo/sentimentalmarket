@@ -1,6 +1,5 @@
 from constants import all_constants
 from config import all_configs
-# from send_notifocations import SendNotification
 from trading_data import TradingData
 import requests
 import websocket
@@ -20,7 +19,6 @@ class MarketDataTracker():
     def __init__(self, coin):
         self.__trade_data = TradingData(coin)
         self.coin = coin
-        # self.snd_inst = SendNotification(self.final_data, bot_key, channel_id)
         self.__websoc_collection = {}
         self.__reset_market = False
         self.__start_trading_counter = {}

@@ -136,7 +136,17 @@ class TradingData():
             start_in_ms = start.timestamp() * 1000
             now_in_ms = time.time() * 1000
             time_index = int(now_in_ms - start_in_ms)/ all_constants.TIME_WINDOW_IN_MSEC[unit_time]
-            index = math.floor(time_index) if round(math.floor(time_index),2) == round(time_index, 2) else math.floor(time_index) + 1
+            index = math.floor(time_index) + 1
+            if self.open_times[unit_time][index * -1] == int(start_in_ms):
+                pass
+            elif self.open_times[unit_time][(index + 1) * -1 ] == int(start_in_ms):
+                index = index + 1
+            elif self.open_times[unit_time][(index - 1) * -1 ] == int(start_in_ms):
+                index = index - 1
+            else:
+                self.reset_data  = True
+                logger.error("Not able to find the right index")
+                
             trading_day_open_times = self.open_times[unit_time][index * -1:]
             
             if (trading_day_open_times[0] == int(start_in_ms)):
