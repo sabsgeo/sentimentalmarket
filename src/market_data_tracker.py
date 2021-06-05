@@ -42,9 +42,9 @@ class MarketDataTracker():
         unit_time = candle['i']
         # This condition makes sure that collection of real time data happens if
         # latest candle stick is closed and the historical data is filled
-        if (len(self.__trade_data.closes[unit_time]) > 0):
+        if (len(self.__trade_data.all_data[unit_time].index) > 0):
             self.__trade_data.update_candle_data(candle, unit_time)
-            self.__update_indicators(unit_time)
+            # self.__update_indicators(unit_time)
             self.__start_trading_counter[unit_time] = 1
 
             today = datetime.utcnow().date()
@@ -55,7 +55,7 @@ class MarketDataTracker():
                 0]
             one_day_in_ms = all_constants.TIME_WINDOW_IN_MSEC.get("1d")
             if (unit_time == smallest_unit_time and is_candle_closed):
-                market_reset = int(self.__trade_data.open_times[smallest_unit_time][-1] + all_constants.TIME_WINDOW_IN_MSEC.get(
+                market_reset = int(self.__trade_data.all_data[unit_time].at[len(self.__trade_data.all_data[unit_time].index) - 1, 'open_time'] + all_constants.TIME_WINDOW_IN_MSEC.get(
                     smallest_unit_time)) == int(start.timestamp() * 1000) + one_day_in_ms
 
             if (market_reset or self.__trade_data.reset_data):
@@ -118,7 +118,7 @@ class MarketDataTracker():
         hist_data_res_2 = requests.get(hist_data_2)
         if (hist_data_res_2.status_code == 200):
             data_2 = hist_data_res_2.json()
-            hist_data_1 = f'https://api.binance.com/api/v3/klines?symbol={self.coin.upper()}USDT&interval={unit_time}&limit=500&endTime={data_2[0][0]}'
+            hist_data_1 = f'https://api.binance.com/api/v3/klines?symbol={self.coin.upper()}USDT&interval={unit_time}&limit=441&endTime={data_2[0][0]}'
             hist_data_res_1 = requests.get(hist_data_1)
             if (hist_data_res_1.status_code == 200):
                 data_1 = hist_data_res_1.json()
@@ -167,7 +167,7 @@ class MarketDataTracker():
                     my_function_call(self.__trade_data)
                     self.__reset_trading_counter()
                     end = time.time()
-                    logger.info(
+                    logger.debug(
                         f"Time taken to get next data {str(end - start)} sec")
                     start = time.time()
             logger.error("Market data getting reset")
@@ -198,12 +198,12 @@ class MarketDataTracker():
     #         # adding this delay to give time for all the websocke to get closed before restart
     #         time.sleep(5)
 
-    def __update_indicators(self, unit_time):
-        start = time.time()
-        for name in dir(self.__trade_data):
-            if name.startswith('update_latest_'):
-                m = getattr(self.__trade_data, name)
-                m(unit_time)
-        end = time.time()
-        logger.debug(
-            f"Time taken for indicator calculations {str(end - start)} sec")
+    # def __update_indicators(self, unit_time):
+    #     start = time.time()
+    #     for name in dir(self.__trade_data):
+    #         if name.startswith('update_latest_'):
+    #             m = getattr(self.__trade_data, name)
+    #             m(unit_time)
+    #     end = time.time()
+    #     logger.debug(
+    #         f"Time taken for indicator calculations {str(end - start)} sec")

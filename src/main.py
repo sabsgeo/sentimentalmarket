@@ -23,5 +23,3 @@ logger.info(f"Running the docker for coin {coin} notification will be send to ch
 if __name__ == "__main__":
     trade = StartTrading(coin)
     trade.trade()
-    # markt = MarketDataTracker(coin, bot_key, channel_id)
-    # markt.track()
