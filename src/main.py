@@ -11,25 +11,28 @@ import os
 import logging
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
-import sentry_sdk
-from sentry_sdk.integrations.logging import LoggingIntegration
-sentry_logging = LoggingIntegration(
-    level=logging.INFO,        # Capture info and above as breadcrumbs
-    event_level=logging.ERROR  # Send errors as events
-)
-sentry_sdk.init(
-    dsn=os.getenv("SENTRY_URL_CTB"),
-    integrations=[sentry_logging]
-)
+# import sentry_sdk
+# from sentry_sdk.integrations.logging import LoggingIntegration
+# sentry_logging = LoggingIntegration(
+#     level=logging.INFO,        # Capture info and above as breadcrumbs
+#     event_level=logging.ERROR  # Send errors as events
+# )
+# sentry_sdk.init(
+#     dsn=os.getenv("SENTRY_URL_CTB"),
+#     integrations=[sentry_logging]
+# )
 
-# from market_data_tracker import MarketDataTracker
-from start_trading import StartTrading
+from sentimentalmarket.market_data_tracker import MarketDataTracker
+from sentimentalmarket.trading_data import TradingData
 from arg_parser import parse_args
 
 coin, bot_key, channel_id = parse_args(sys.argv)
 
 logger.info(f"Running the docker for coin {coin} notification will be send to channel id {channel_id} using api key {bot_key}")
 
+def trading_mechanism(marker_data: TradingData):
+    print(marker_data.all_data["5m"])
+
 if __name__ == "__main__":
-    trade = StartTrading(coin)
-    trade.trade()
+    market_data = MarketDataTracker(coin)
+    market_data.start_data_collection(trading_mechanism)

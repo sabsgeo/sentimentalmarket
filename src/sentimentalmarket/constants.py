@@ -1,5 +1,5 @@
-import decorators
-from config import all_configs
+from sentimentalmarket import decorators
+from  sentimentalmarket.config import all_configs
 
 
 class _Const(object):

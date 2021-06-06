@@ -1,6 +1,6 @@
-from constants import all_constants
-from config import all_configs
-from trading_data import TradingData
+from sentimentalmarket.constants import all_constants
+from sentimentalmarket.config import all_configs
+from sentimentalmarket.trading_data import TradingData
 import requests
 import websocket
 import threading

@@ -2,7 +2,7 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
-from config import all_configs
+from sentimentalmarket.config import all_configs
 
 
 def parse_args(all_args):
