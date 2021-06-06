@@ -24,6 +24,7 @@ sentry_sdk.init(
 
 from sentimentalmarket.market_data_tracker import MarketDataTracker
 from sentimentalmarket.trading_data import TradingData
+from algorithms.trending_lines import cal_support_and_resistance
 from arg_parser import parse_args
 
 coin, bot_key, channel_id = parse_args(sys.argv)
@@ -31,7 +32,8 @@ coin, bot_key, channel_id = parse_args(sys.argv)
 logger.info(f"Running the docker for coin {coin} notification will be send to channel id {channel_id} using api key {bot_key}")
 
 def trading_mechanism(marker_data: TradingData):
-    print(marker_data.all_data["5m"])
+    s_r = marker_data.all_data["4h"].tail(60)
+    print(cal_support_and_resistance(s_r))
 
 if __name__ == "__main__":
     market_data = MarketDataTracker(coin)
