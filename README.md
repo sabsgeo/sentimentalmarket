@@ -120,14 +120,15 @@ Example data output format
   "M": true         // Ignore
 }
 ```
+## Stage Right now
+Can get any cryptocurrency coin data for any time interval candel stick as a update rate of 2 seconds.
+Right now its can get data for 1m, 5m, 15m,1h,4h,1d every two seconds
 
-
-## Rules that are coded
-1. RSI MACD and VWAP calculations are happening accurately and tested it with https://coinmarketcap.com/ Ethereum data
-
-## Future plan
-1. Add candle stick patten detection
-2. Making a decision based on the above params
+## Things to read next before coding up the strategy
+1) cmcmarkets.com/en/trading-guides/how-to-swing-trade-stocks
+2) https://towardsdatascience.com/technical-pattern-recognition-for-trading-in-python-63770aab422f
+3) https://robotwealth.com/pattern-recognition-with-the-frechet-distance/
+4) https://arxiv.org/pdf/1410.1231.pdf
 
 ## Disclamer
 I am not a market expert I am just coding things that I have learned from my information sources
