@@ -9,8 +9,8 @@ RUN pip install --upgrade pip && pip3 install -r requirements.txt
 #######################
 # Running purpose
 #######################
-COPY src/* /
-ENTRYPOINT ["python3", "-u", "/main.py"]
+COPY src /src
+ENTRYPOINT ["python3", "-u", "/src/main.py"]
 
 ######################
 # Testing purpose

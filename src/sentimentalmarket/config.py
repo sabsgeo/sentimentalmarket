@@ -1,4 +1,4 @@
-import decorators
+from sentimentalmarket import decorators
 
 
 class _Configs(object):
