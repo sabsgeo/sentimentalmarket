@@ -11,16 +11,16 @@ import os
 import logging
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
-# import sentry_sdk
-# from sentry_sdk.integrations.logging import LoggingIntegration
-# sentry_logging = LoggingIntegration(
-#     level=logging.INFO,        # Capture info and above as breadcrumbs
-#     event_level=logging.ERROR  # Send errors as events
-# )
-# sentry_sdk.init(
-#     dsn=os.getenv("SENTRY_URL_CTB"),
-#     integrations=[sentry_logging]
-# )
+import sentry_sdk
+from sentry_sdk.integrations.logging import LoggingIntegration
+sentry_logging = LoggingIntegration(
+    level=logging.INFO,        # Capture info and above as breadcrumbs
+    event_level=logging.ERROR  # Send errors as events
+)
+sentry_sdk.init(
+    dsn=os.getenv("SENTRY_URL_CTB"),
+    integrations=[sentry_logging]
+)
 
 from sentimentalmarket.market_data_tracker import MarketDataTracker
 from sentimentalmarket.trading_data import TradingData
