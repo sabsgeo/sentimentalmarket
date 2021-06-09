@@ -125,10 +125,11 @@ Can get any cryptocurrency coin data for any time interval candel stick as a upd
 Right now its can get data for 1m, 5m, 15m,1h,4h,1d every two seconds
 
 ## Things to read next before coding up the strategy
-1) cmcmarkets.com/en/trading-guides/how-to-swing-trade-stocks
+1) https://cmcmarkets.com/en/trading-guides/how-to-swing-trade-stocks
 2) https://towardsdatascience.com/technical-pattern-recognition-for-trading-in-python-63770aab422f
 3) https://robotwealth.com/pattern-recognition-with-the-frechet-distance/
 4) https://arxiv.org/pdf/1410.1231.pdf
+5) https://github.com/LastAncientOne/Stock_Analysis_For_Quant
 
 ## Disclamer
 I am not a market expert I am just coding things that I have learned from my information sources
