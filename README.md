@@ -130,6 +130,7 @@ Right now its can get data for 1m, 5m, 15m,1h,4h,1d every two seconds
 3) https://robotwealth.com/pattern-recognition-with-the-frechet-distance/
 4) https://arxiv.org/pdf/1410.1231.pdf
 5) https://github.com/LastAncientOne/Stock_Analysis_For_Quant
+6) https://zerodha.com/varsity/
 
 ## Disclamer
 I am not a market expert I am just coding things that I have learned from my information sources
