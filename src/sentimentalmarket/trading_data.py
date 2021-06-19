@@ -1,8 +1,5 @@
-from sentimentalmarket.config import all_configs
 from sentimentalmarket.constants import all_constants
 import pandas as pd
-import numpy
-import talib
 import json
 import time
 import logging

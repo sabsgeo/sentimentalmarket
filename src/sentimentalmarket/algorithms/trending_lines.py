@@ -16,7 +16,7 @@ def __is_resistance(df,i):
 def __is_far_from_level(l, s,levels):
   return np.sum([abs(l-x[1]) < s  for x in levels]) == 0
 
-def cal_support_and_resistance(df):
+def calc_support_and_resistance(df):
     """
     Base code from here
     https://github.com/gianlucamalato/machinelearning/blob/master/Support_and_resistance.ipynb

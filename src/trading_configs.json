@@ -1,0 +1,13 @@
+{
+    "notify_on": ["telegram"],
+    "telegram_settings": {
+        "channel_id": "-1001216735581",
+        "bot_key": "1680144394:AAGBzjOwcnBvrFupJsbMe-KdTx7HPYh68QM"
+    },
+    "rsi": {
+        "over_sold": 20,
+        "over_bought": 80,
+        "length": 14,
+        "source": "close_price"
+    }
+}
