@@ -1,20 +1,27 @@
 from sentimentalmarket import decorators
-from  sentimentalmarket.config import all_configs
 
 
 class _Const(object):
 
     @decorators.constant
+    def SUPPORTED_TIME_WINDOW():
+        return ["1m", "5m", "15m", "1h", "4h", "1d"]
+    
+    @decorators.constant
+    def SUPPORTED_COINS():
+        return ['eth', 'xrp', 'matic', '1inch', 'bnb', 'ada']
+    
+    @decorators.constant
     def EMPTY_UNIT_ARRAY():
         _ = {}
-        for unit_time in all_configs.TECHNICAL_INDICATOR_CONF.get("TIME_WINDOW"):
+        for unit_time in _Const.SUPPORTED_TIME_WINDOW:
             _[unit_time] = []
         return dict(_)
 
     @decorators.constant
     def EMPTY_UNIT_DICT():
         _ = {}
-        for unit_time in all_configs.TECHNICAL_INDICATOR_CONF.get("TIME_WINDOW"):
+        for unit_time in _Const.SUPPORTED_TIME_WINDOW:
             _[unit_time] = {}
         return dict(_)
 

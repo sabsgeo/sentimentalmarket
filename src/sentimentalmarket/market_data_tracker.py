@@ -1,12 +1,14 @@
 from sentimentalmarket.constants import all_constants
-from sentimentalmarket.config import all_configs
 from sentimentalmarket.trading_data import TradingData
+from sentimentalmarket.strategy.base import IStrategy
+from sentimentalmarket.user_config import UserConfig
 import requests
 import websocket
 import threading
 import time
 import json
 import sys
+import os
 from dateutil import tz
 from datetime import datetime
 import logging
@@ -23,6 +25,8 @@ class MarketDataTracker():
         self.__reset_market = False
         self.__start_trading_counter = {}
         self.__reset_trading_counter()
+        
+        # logger.info(f"Running the docker for coin {coin} notification will be send to channel id {channel_id} using api key {bot_key}")
 
     def __on_open(self, ws):
         logger.info('open connection')
@@ -51,8 +55,7 @@ class MarketDataTracker():
             start = datetime(today.year, today.month,
                              today.day, tzinfo=tz.tzutc())
             market_reset = False
-            smallest_unit_time = all_configs.TECHNICAL_INDICATOR_CONF.get("TIME_WINDOW")[
-                0]
+            smallest_unit_time = all_constants.SUPPORTED_TIME_WINDOW[0]
             one_day_in_ms = all_constants.TIME_WINDOW_IN_MSEC.get("1d")
             if (unit_time == smallest_unit_time and is_candle_closed):
                 market_reset = int(self.__trade_data.all_data[unit_time].at[len(self.__trade_data.all_data[unit_time].index) - 1, 'open_time'] + all_constants.TIME_WINDOW_IN_MSEC.get(
@@ -142,37 +145,41 @@ class MarketDataTracker():
         return all_hist_data
     
     def __reset_trading_counter(self):
-        for unit_time in all_configs.TECHNICAL_INDICATOR_CONF.get('TIME_WINDOW'):
+        for unit_time in all_constants.SUPPORTED_TIME_WINDOW:
             self.__start_trading_counter[unit_time] = 0
         self.__start_trading_counter["price"] = 0  
     
-    def start_data_collection(self, my_function_call):
+    def start_trading(self, trading_strategy_cls: IStrategy, config_path):
         # Getting data
-        while True:
-            self.__reset_market = False
-            self.__reset_trading_counter()
-            self.__trade_data.reset_all_data()
-            for unit_time in all_configs.TECHNICAL_INDICATOR_CONF.get('TIME_WINDOW'):
-                threading.Thread(target=self.__start_candles,
-                                    args=(unit_time,)).start()
-            threading.Thread(target=self.__get_real_time_price).start()
-            
-            start = time.time()
-            while not(self.__reset_market):
-                all_trade_sum = 0
-                for key in self.__start_trading_counter.keys():
-                    all_trade_sum += self.__start_trading_counter[key]
+        if (os.path.isfile(config_path) and os.path.exists(config_path)):
+            user_configs = UserConfig(config_path).all_config
+            while True:
+                strategy_inst = trading_strategy_cls()
+                self.__reset_market = False
+                self.__reset_trading_counter()
+                self.__trade_data.reset_all_data()
+                for unit_time in all_constants.SUPPORTED_TIME_WINDOW:
+                    threading.Thread(target=self.__start_candles,
+                                        args=(unit_time,)).start()
+                threading.Thread(target=self.__get_real_time_price).start()
                 
-                if all_trade_sum == len(all_configs.TECHNICAL_INDICATOR_CONF.get('TIME_WINDOW')) + 1:
-                    my_function_call(self.__trade_data)
-                    self.__reset_trading_counter()
-                    end = time.time()
-                    logger.debug(
-                        f"Time taken to get next data {str(end - start)} sec")
-                    start = time.time()
-            logger.error("Market data getting reset")
+                start = time.time()
+                while not(self.__reset_market):
+                    all_trade_sum = 0
+                    for key in self.__start_trading_counter.keys():
+                        all_trade_sum += self.__start_trading_counter[key]
+                    
+                    if all_trade_sum == len(all_constants.SUPPORTED_TIME_WINDOW) + 1:
+                        # my_function_call(self.__trade_data)
+                        strategy_inst.decide_and_notify(self.__trade_data, user_configs)
+                        self.__reset_trading_counter()
+                        end = time.time()
+                        logger.debug(
+                            f"Time taken to get next data {str(end - start)} sec")
+                        start = time.time()
+                logger.error("Market data getting reset")
         # all_trade_sum = 0
-        # while all_trade_sum != len(all_configs.TECHNICAL_INDICATOR_CONF.get('TIME_WINDOW')) + 1:
+        # while all_trade_sum != len(all_constants.SUPPORTED_TIME_WINDOW) + 1:
         #     all_trade_sum = 0
         #     for key in self.__start_trading_counter.keys():
         #         all_trade_sum += self.__start_trading_counter[key]
@@ -186,7 +193,7 @@ class MarketDataTracker():
     #     while True:
     #         self.final_data.reset_all_data()
     #         self.reset_trading = True
-    #         for unit_time in all_configs.TECHNICAL_INDICATOR_CONF.get('TIME_WINDOW'):
+    #         for unit_time in all_constants.SUPPORTED_TIME_WINDOW:
     #             threading.Thread(target=self.__start_candles,
     #                              args=(unit_time,)).start()
 

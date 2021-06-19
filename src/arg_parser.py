@@ -2,12 +2,11 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
-from sentimentalmarket.config import all_configs
+from sentimentalmarket import all_constants
 
 
 def parse_args(all_args):
-    supported_coins = all_configs.TECHNICAL_INDICATOR_CONF.get(
-        "SUPPORTED_COINS")
+    supported_coins = all_constants.SUPPORTED_COINS
     try:
         coin = all_args[1]
     except:
