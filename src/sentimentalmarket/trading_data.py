@@ -80,14 +80,14 @@ class TradingData():
         self.__update_session_index(unit_time)
 
     def __update_session_index(self, unit_time):
-        if all_constants.TIME_WINDOW_IN_MSEC[unit_time] < all_constants.TIME_WINDOW_IN_MSEC["1d"] / 2:
+        if all_constants.TIME_WINDOW_IN_MSEC.get(unit_time) < all_constants.TIME_WINDOW_IN_MSEC.get("1d") / 2:
             today = datetime.utcnow().date()
             start = datetime(today.year, today.month,
                              today.day, tzinfo=tz.tzutc())
             start_in_ms = start.timestamp() * 1000
             now_in_ms = time.time() * 1000
             time_index = int(now_in_ms - start_in_ms) / \
-                all_constants.TIME_WINDOW_IN_MSEC[unit_time]
+                all_constants.TIME_WINDOW_IN_MSEC.get(unit_time)
             index = math.floor(time_index) + 1
             if self.all_data[unit_time].at[self.all_data[unit_time].tail(index).index[0], "open_time"] == int(start_in_ms):
                 pass
