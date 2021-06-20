@@ -1,19 +1,22 @@
-FROM python:3.8
-RUN apt-get update -y
+FROM debian:buster
 
-COPY deps/ta-lib-0.4.0-src.tar.gz /ta-lib-0.4.0-src.tar.gz 
-RUN tar -xzf /ta-lib-0.4.0-src.tar.gz && cd ta-lib/ && ./configure --prefix=/usr && make && make install
-COPY requirements.txt requirements.txt
-RUN pip install --upgrade pip && pip3 install -r requirements.txt
+RUN apt-get update -y && \
+    apt-get install -y --no-install-recommends \
+    wget \
+    build-essential \
+    ca-certificates \
+    python3-dev \
+    python3-pip \
+    git \
+    python3-setuptools
 
-#######################
-# Running purpose
-#######################
-COPY src /src
-ENTRYPOINT ["python3", "-u", "/src/main.py"]
+RUN wget https://raw.githubusercontent.com/sabsgeo/sentimentalmarket/main/install_talib.sh && \
+    chmod +x install_talib.sh && \
+    ./install_talib.sh 
 
-######################
-# Testing purpose
-######################
-# COPY test.py /test.py
-# ENTRYPOINT ["python3", "-u", "test.py"]
+RUN python3 -m pip install --upgrade --force-reinstall pip && pip3 install git+https://github.com/sabsgeo/sentimentalmarket.git
+
+COPY example/* /
+ENTRYPOINT ["python3", "-u", "/main.py"]
+
+
