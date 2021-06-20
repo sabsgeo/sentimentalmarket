@@ -1,4 +1,4 @@
-# Crypto Trading bot
+# Sentimentalmarket
 This is a docker application which will send you triggers by checking trading indicators
 Right now trading indictor that is been inregrated is RSI.
 More indicators will be added soon
