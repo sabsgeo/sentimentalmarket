@@ -13,7 +13,7 @@ class RsiEngulfingCandles(IStrategy):
         one_hrs_df = trading_data.all_data["1h"]
         all_rsi = talib.RSI(one_hrs_df[source].to_numpy(), length)
         latest_rsi = round(all_rsi[-1], 2)
-        buy = True
+        buy = False
         if (latest_rsi < threshod):
             buy = True
     
