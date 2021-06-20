@@ -1,17 +1,45 @@
 # Sentimentalmarket
-This is a docker application which will send you triggers by checking trading indicators
+This is a python package which will send you triggers by checking trading indicators
 Right now trading indictor that is been inregrated is RSI.
 More indicators will be added soon
 
-## How to run the application
-This application is made with docker as the environment management system. So assumption is that
-the host system will have docker installed.
+## System requirements
+1. OS should be some verion of linux or MAC
+2. talib installtion script is [here](install_talib.sh)
 
-Here is the sample command to build the docker
+## How to install the package
 ```
-TAG=0.0.1 docker build -t sabugeorgemec/trading-bot:${TAG} .
+pip install git+https://github.com/sabsgeo/sentimentalmarket.git
 ```
-## How to run the docker
+## How to build the docker
+There is already a docker file that is avaible in the repository please use it [here](Dockerfile).
+
+## How to run the package
+1. Setup a telegram channel first its documented in this readme
+2. Create a configuration file which contains information like coin to watch, indictaor parameters etc.
+Here is example configuration
+
+```
+{
+    "coin": "eth",
+    "notify_on": ["telegram"],
+    "telegram_settings": {
+        "channel_id": "-xxxxxxxxxxxxxxx",
+        "bot_key": "xxxxxxxxxx:xxxxxxxxxxxxxx-xxxxxxxxxxxxxxx"
+    },
+    "rsi": {
+        "over_sold": 20,
+        "over_bought": 80,
+        "length": 14,
+        "source": "close_price"
+    }
+}
+```
+
+3. Create a strategy class by importing IStrategy from the package as the base class
+4. Combine everything together. [Here](example) an example code with these steps
+
+## How to setup telegram channel 
 For this docker to run and send you notification you need a telegram channel id and an API key to communicate with the channel.
 Following are the steps to follow to get these two information.
 1. Make public telegram channel from the telegram mobile application
@@ -20,10 +48,6 @@ Following are the steps to follow to get these two information.
 4. Make yourself and telegram bot admin of the public telegram channel that you created so that the bot can post the messages
 5. Get the channel ID by forwarding a message from the channel to @JsonDumpBot
 
-Now to run the docker use the following sample command
-```
-TAG=0.0.1 API_KEY=<api-key> CHAN_ID=<channel-id> docker run -it sabugeorgemec/trading-bot:${TAG} eth "${API_KEY}" "${CHAN_ID}"
-```
 
 ## Websockets and REST API's used for data access
 In the code I have used two modes to gets the data.
@@ -120,9 +144,11 @@ Example data output format
   "M": true         // Ignore
 }
 ```
-## Stage Right now
-Can get any cryptocurrency coin data for any time interval candel stick as a update rate of 2 seconds.
-Right now its can get data for 1m, 5m, 15m,1h,4h,1d every two seconds
+## Some characteristics
+1. Supported coins, 'eth', 'xrp', 'matic', '1inch', 'bnb', 'ada', Others not tested will be tested more
+2. Supported window '1m', '5m', '15m', '1h', '4h', '1d', Other not tested will be tested more soon
+3. Update rate 2 seconds
+4. Number of candle sticks at any given time 1440 max 
 
 ## Things to read next before coding up the strategy
 1) https://cmcmarkets.com/en/trading-guides/how-to-swing-trade-stocks
