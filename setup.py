@@ -21,18 +21,8 @@ def get_requirements(raw=False):
 def get_packages_requirements(raw=False):
     """Build the package & requirements list for this project"""
     reqs = get_requirements(raw=raw)
-
     exclude = ['tests*']
-    if raw:
-        exclude.append('telegram.ext*')
-
     packs = find_packages(exclude=exclude)
-    # Allow for a package install to not use the vendored urllib3
-    if UPSTREAM_URLLIB3_FLAG in sys.argv:
-        sys.argv.remove(UPSTREAM_URLLIB3_FLAG)
-        reqs.append('urllib3 >= 1.19.1')
-        packs = [x for x in packs if not x.startswith('telegram.vendor.ptb_urllib3')]
-
     return packs, reqs
 
 packages, requirements = get_packages_requirements()
