@@ -18,7 +18,18 @@ logger = logging.getLogger(__name__)
 class MarketDataTracker():
     DEFAULT_MAX_DATA_BY_BINANCE = 500
 
-    def __init__(self, coin):
+    def __init__(self, user_config_path: str):
+        if (os.path.isfile(user_config_path) and os.path.exists(user_config_path)):
+            self.__user_configs = UserConfig(user_config_path).all_config
+        else:
+            raise Exception("Config file path is not valid or does not exist")
+    
+        coin = self.__user_configs.get('coin')
+        
+        if not(coin in all_constants.SUPPORTED_COINS):
+            joined_coin = ",".join(all_constants.SUPPORTED_COINS)
+            raise Exception(f"Coin not supported. Supported coins are {joined_coin}")
+        
         self.__trade_data = TradingData(coin)
         self.coin = coin
         self.__websoc_collection = {}
@@ -149,35 +160,33 @@ class MarketDataTracker():
             self.__start_trading_counter[unit_time] = 0
         self.__start_trading_counter["price"] = 0  
     
-    def start_trading(self, trading_strategy_cls: IStrategy, config_path):
+    def start_trading(self, trading_strategy_cls: IStrategy):
         # Getting data
-        if (os.path.isfile(config_path) and os.path.exists(config_path)):
-            user_configs = UserConfig(config_path).all_config
-            while True:
-                strategy_inst = trading_strategy_cls()
-                self.__reset_market = False
-                self.__reset_trading_counter()
-                self.__trade_data.reset_all_data()
-                for unit_time in all_constants.SUPPORTED_TIME_WINDOW:
-                    threading.Thread(target=self.__start_candles,
-                                        args=(unit_time,)).start()
-                threading.Thread(target=self.__get_real_time_price).start()
+        while True:
+            strategy_inst = trading_strategy_cls()
+            self.__reset_market = False
+            self.__reset_trading_counter()
+            self.__trade_data.reset_all_data()
+            for unit_time in all_constants.SUPPORTED_TIME_WINDOW:
+                threading.Thread(target=self.__start_candles,
+                                    args=(unit_time,)).start()
+            threading.Thread(target=self.__get_real_time_price).start()
+            
+            start = time.time()
+            while not(self.__reset_market):
+                all_trade_sum = 0
+                for key in self.__start_trading_counter.keys():
+                    all_trade_sum += self.__start_trading_counter[key]
                 
-                start = time.time()
-                while not(self.__reset_market):
-                    all_trade_sum = 0
-                    for key in self.__start_trading_counter.keys():
-                        all_trade_sum += self.__start_trading_counter[key]
-                    
-                    if all_trade_sum == len(all_constants.SUPPORTED_TIME_WINDOW) + 1:
-                        # my_function_call(self.__trade_data)
-                        strategy_inst.decide_and_notify(self.__trade_data, user_configs)
-                        self.__reset_trading_counter()
-                        end = time.time()
-                        logger.debug(
-                            f"Time taken to get next data {str(end - start)} sec")
-                        start = time.time()
-                logger.error("Market data getting reset")
+                if all_trade_sum == len(all_constants.SUPPORTED_TIME_WINDOW) + 1:
+                    # my_function_call(self.__trade_data)
+                    strategy_inst.decide_and_notify(self.__trade_data, self.__user_configs)
+                    self.__reset_trading_counter()
+                    end = time.time()
+                    logger.debug(
+                        f"Time taken to get next data {str(end - start)} sec")
+                    start = time.time()
+            logger.error("Market data getting reset")
         # all_trade_sum = 0
         # while all_trade_sum != len(all_constants.SUPPORTED_TIME_WINDOW) + 1:
         #     all_trade_sum = 0
